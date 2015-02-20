@@ -16,12 +16,8 @@
                         container=itemTpl.parentNode,
                         h=container.offsetHeight,
                         itemH = attrs.uxVirtualistItemheight || 25,//itemTpl.offsetHeight,
-                        items=scope.uxVirtualist,
-                        rows=items.length,
                         virtualEl=document.createElement("div"),
                         viewableItems=Math.ceil(h / itemH),
-                        lowTide= 0,
-                        highTide=rows,
                         holdingEl=document.createElement("div"),
                         chunk=scope.uxVirtualist.slice(0, viewableItems),
                         tplHtml=itemTpl.innerHTML.replace("::", ""),
@@ -32,7 +28,7 @@
                     }
                     container.removeChild(itemTpl);
                     angular.element(virtualEl).css({
-                        height:(itemH*rows)+'px'
+                        height:(itemH*scope.uxVirtualist.length)+'px'
                     });
                     angular.element(holdingEl).css({
                         position:'absolute',
@@ -45,7 +41,6 @@
                         for(var i=0;i<chunk.length;i++){
                             thisHtml=tplHtml;
                             for(var s=0;s<bound.length;s++){
-                                console.log(scope.uxVirtualist[i]);
                                 thisHtml=thisHtml.replace("{{"+bound[s]+"}}", chunk[i][bound[s]]);
                             }
                             htmlStr+="<div>"+thisHtml+"</div>";
@@ -54,8 +49,8 @@
                     }
                     genItems();
                     angular.element(container).on('scroll', function(){
-                        lowTide=Math.floor(container.scrollTop / itemH);
-                        highTide=lowTide+viewableItems;
+                        var lowTide=Math.floor(container.scrollTop / itemH),
+                            highTide=lowTide+viewableItems;
                         chunk = scope.uxVirtualist.slice(lowTide, highTide);
                         angular.element(holdingEl).css({
                             top:container.scrollTop+'px'
