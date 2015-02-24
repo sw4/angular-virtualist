@@ -27,7 +27,8 @@
                         bound=[],
                         lowTide= 0,highTide= 0,
                         tplEl=document.createElement("div"),
-                        tplHtml="";
+                        tplHtml="",
+                        rExpP=new RegExp("{{::", "g");
 
                     tplEl.appendChild(itemTpl);
                     tplEl.children[0].removeAttribute('ux-virtualist');
@@ -35,7 +36,7 @@
                     angular.element(tplEl.children[0]).removeClass('ng-scope ng-binding ng-isolate-scope');
                     if(!tplEl.children[0].getAttribute("class"))tplEl.children[0].removeAttribute("class");
                     tplHtml=tplEl.innerHTML;
-                    tplHtml=tplHtml.replace("::", "");
+                    tplHtml=tplHtml.replace(rExpP, "{{");
                     var bindings =  tplHtml.split("{{");
                     for(var b=0;b<bindings.length;b++){
                         if(bindings[b].indexOf("}}")>-1) bound.push(bindings[b].substr(0,bindings[b].indexOf("}}")));
