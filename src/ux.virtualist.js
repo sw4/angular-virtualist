@@ -1,5 +1,8 @@
 /*
  * To use: <div ux-virtualist="optionsArray" ux-virtualist-itemheight="integer"></div>
+ *
+ * TODO: list is not updated on option model change (to check- hypothetically should be, at least on scroll)
+ * TODO: No resize detection in terms of virtualisation area
  */
 (function (angular){
     'use strict';
@@ -15,47 +18,71 @@
                     var itemTpl=el[0],
                         container=itemTpl.parentNode,
                         h=container.offsetHeight,
-                        itemH = attrs.uxVirtualistItemheight || 25,//itemTpl.offsetHeight,
+                        itemH = parseInt(attrs.uxVirtualistItemheight,0) || 25,//itemTpl.offsetHeight,
                         virtualEl=document.createElement("div"),
+                        virtualElH=0,
                         viewableItems=Math.ceil(h / itemH),
-                        holdingEl=document.createElement("div"),
+                        holdingEl=document.createElement(container.tagName),
                         chunk=scope.uxVirtualist.slice(0, viewableItems),
-                        tplHtml=itemTpl.innerHTML.replace("::", ""),
-                        bindings =  tplHtml.split("{{"),
-                        bound=[];
+                        bound=[],
+                        lowTide= 0,highTide= 0,
+                        tplEl=document.createElement("div"),
+                        tplHtml="";
+
+                    tplEl.appendChild(itemTpl);
+                    tplEl.children[0].removeAttribute('ux-virtualist');
+                    tplEl.children[0].removeAttribute('ux-virtualist-itemheight');
+                    angular.element(tplEl.children[0]).removeClass('ng-scope ng-binding ng-isolate-scope');
+                    if(!tplEl.children[0].getAttribute("class"))tplEl.children[0].removeAttribute("class");
+                    tplHtml=tplEl.innerHTML;
+                    tplHtml=tplHtml.replace("::", "");
+                    var bindings =  tplHtml.split("{{");
                     for(var b=0;b<bindings.length;b++){
                         if(bindings[b].indexOf("}}")>-1) bound.push(bindings[b].substr(0,bindings[b].indexOf("}}")));
                     }
-                    container.removeChild(itemTpl);
-                    angular.element(virtualEl).css({
-                        height:(itemH*scope.uxVirtualist.length)+'px'
-                    });
                     angular.element(holdingEl).css({
                         position:'absolute',
-                        top:0
+                        top:0,
+                        width:"100%"
+                    });
+                    scope.$watch('uxVirtualist', function(){
+                        chunkItems();
                     });
                     container.appendChild(virtualEl);
                     virtualEl.appendChild(holdingEl);
-                    function genItems(){
-                        var htmlStr="", thisHtml="";
+                    function drawItems(){
+                        var htmlStr="", thisHtml="", thisAttrs="";
+                        if(itemH*scope.uxVirtualist.length !== virtualElH) {
+                            virtualElH=itemH * scope.uxVirtualist.length;
+                            angular.element(virtualEl).css({
+                                height: virtualElH + 'px',
+                                width:"100%"
+                            });
+                        }
                         for(var i=0;i<chunk.length;i++){
                             thisHtml=tplHtml;
                             for(var s=0;s<bound.length;s++){
                                 thisHtml=thisHtml.replace("{{"+bound[s]+"}}", chunk[i][bound[s]]);
                             }
-                            htmlStr+="<div>"+thisHtml+"</div>";
+                            htmlStr+=thisHtml;
                         }
                         holdingEl.innerHTML=htmlStr;
                     }
-                    genItems();
-                    angular.element(container).on('scroll', function(){
-                        var lowTide=Math.floor(container.scrollTop / itemH),
-                            highTide=lowTide+viewableItems;
+                    fetchItems();
+                    function chunkItems() {
                         chunk = scope.uxVirtualist.slice(lowTide, highTide);
+                        drawItems();
+                    }
+                    function fetchItems(){
+                        lowTide=Math.floor(container.scrollTop / itemH);
+                        highTide=lowTide+viewableItems;
+                        chunkItems();
+                    }
+                    angular.element(container).on('scroll', function(){
+                        fetchItems();
                         angular.element(holdingEl).css({
                             top:container.scrollTop+'px'
                         });
-                        genItems();
                     });
                 }
             };
