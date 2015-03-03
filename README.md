@@ -1,4 +1,4 @@
-# ux.virtualist
+# virtualist
 Lightweight angular virtual scrolling / list virtualisation
 
 - Reduces $watch count
@@ -14,7 +14,7 @@ Only renders the currently visible items in the viewport, to use- where you woul
 
 With:
 
-`<div ux-virtualist="optionsArray" ux-virtualist-itemheight="integer">Name: {{::name}} Value: {{value}}</div>`
+`<div ux-virtualist="optionsArray" virtualist-itemheight="integer">Name: {{::name}} Value: {{value}}</div>`
 
 
-Where `ux-virtualist-itemheight` is the height in pixels of a single item.
+Where `virtualist-itemheight` is the height in pixels of a single item.
