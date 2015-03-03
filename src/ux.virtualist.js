@@ -1,41 +1,41 @@
 /*
- * To use: <div ux-virtualist="optionsArray" ux-virtualist-itemheight="integer"></div>
+ * To use: <div virtualist="optionsArray" virtualist-itemheight="integer"></div>
  *
  * TODO: list is not updated on option model change (to check- hypothetically should be, at least on scroll)
  * TODO: No resize detection in terms of virtualisation area
  */
 (function(angular) {
     'use strict';
-    angular.module('ux.virtualist', [])
-        .directive('uxVirtualist', function() {
+    angular.module('virtualist', [])
+        .directive('virtualist', function() {
             return {
                 restrict: 'A',
                 replace: false,
                 scope: {
-                    uxVirtualist: '='
+                    virtualist: '='
                 },
                 link: function(scope, el, attrs) {
                     var itemTpl = el[0],
                         container = itemTpl.parentNode,
                         h = container.offsetHeight,
-                        itemH = parseInt(attrs.uxVirtualistItemheight, 0) || 25, //itemTpl.offsetHeight,
+                        itemH = parseInt(attrs.virtualistItemheight, 0) || 25, //itemTpl.offsetHeight,
                         virtualEl = document.createElement("div"),
                         virtualElH = 0,
                         viewableItems = Math.ceil(h / itemH),
                         holdingEl = document.createElement(container.tagName),
-                        chunk = scope.uxVirtualist.slice(0, viewableItems),
+                        chunk = scope.virtualist.slice(0, viewableItems),
                         bound = [],
                         lowTide = 0,
                         highTide = 0,
                         tplEl = document.createElement("div"),
                         tplHtml = "",
                         rExpP = new RegExp("{{::", "g"),
-                        complexity = el[0].hasAttribute('ux-virtualist-complex');
+                        complexity = el[0].hasAttribute('virtualist-complex');
 
                     tplEl.appendChild(itemTpl);
-                    tplEl.children[0].removeAttribute('ux-virtualist');
-                    tplEl.children[0].removeAttribute('ux-virtualist-itemheight');
-                    tplEl.children[0].removeAttribute('ux-virtualist-complex');
+                    tplEl.children[0].removeAttribute('virtualist');
+                    tplEl.children[0].removeAttribute('virtualist-itemheight');
+                    tplEl.children[0].removeAttribute('virtualist-complex');
                     angular.element(tplEl.children[0]).removeClass('ng-scope ng-binding ng-isolate-scope');
                     // removes blank class designations e.g class=""
                     if (!tplEl.children[0].getAttribute("class")) tplEl.children[0].removeAttribute("class");
@@ -52,7 +52,7 @@
                         top: 0,
                         width: "100%"
                     });
-                    scope.$watch('uxVirtualist', function() {
+                    scope.$watch('virtualist', function() {
                         chunkItems();
                     }, complexity);
                     container.appendChild(virtualEl);
@@ -61,8 +61,8 @@
                     function drawItems() {
                         var htmlStr = "",
                             thisHtml = "";
-                        if (itemH * scope.uxVirtualist.length !== virtualElH) {
-                            virtualElH = itemH * scope.uxVirtualist.length;
+                        if (itemH * scope.virtualist.length !== virtualElH) {
+                            virtualElH = itemH * scope.virtualist.length;
                             angular.element(virtualEl).css({
                                 height: virtualElH + 'px',
                                 width: "100%"
@@ -81,8 +81,8 @@
                     fetchItems();
 
                     function chunkItems() {
-                        if(scope.uxVirtualist) {
-                            chunk = scope.uxVirtualist.slice(lowTide, highTide);
+                        if(scope.virtualist) {
+                            chunk = scope.virtualist.slice(lowTide, highTide);
                         }
                         drawItems();
                     }
