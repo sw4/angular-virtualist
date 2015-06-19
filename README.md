@@ -1,6 +1,8 @@
 # virtualist
 Lightweight angular virtual scrolling / list virtualisation
 
+Draft. Deprecated.
+
 - Reduces $watch count
 - Reduces $digest clutter
 - Reduces DOM complexity
